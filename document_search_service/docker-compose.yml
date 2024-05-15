@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  # Сервис для запуска Django приложения
+  web:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: python manage.py runserver 0.0.0.0:3055
+    volumes:
+      - web:/web
+    ports:
+      - "3055:3055"
+    depends_on:
+      - elasticsearch
+    networks:
+      - my_nw
+
+  # Сервис для запуска Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - my_nw
+
+networks:
+  my_nw:
+
+volumes:
+  web:
+  elasticsearch_data:
