@@ -7,6 +7,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny
+from .serializers import PostSerializer
 
 @swagger_auto_schema(
     method='get',
@@ -21,8 +22,13 @@ def search_view(request):
     """
     query = request.GET.get('q', '')
     posts = search_posts(query)
-    posts_list = list(posts.values())
-    return JsonResponse(posts_list, safe=False, json_dumps_params={'ensure_ascii': False})
+    # posts_list = list(posts.values())
+    # return JsonResponse(posts_list, safe=False, json_dumps_params={'ensure_ascii': False})
+    serializer = PostSerializer(posts, many=True)  # Используем сериализатор для сериализации QuerySet в JSON
+    return JsonResponse(serializer.data, safe=False, json_dumps_params={'ensure_ascii': False})
+
+    
+
 
 @swagger_auto_schema(
     method='get',

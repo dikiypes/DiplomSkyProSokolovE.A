@@ -7,13 +7,31 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: python manage.py runserver 0.0.0.0:3055
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:3055"
     volumes:
       - web:/web
     ports:
       - "3055:3055"
     depends_on:
+      - db
       - elasticsearch
+    environment:
+      POSTGRES_DB: myproject
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: 1234
+    networks:
+      - my_nw
+
+  # Сервис для запуска PostgreSQL
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_DB: myproject
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: 1234
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - my_nw
 
@@ -35,4 +53,5 @@ networks:
 
 volumes:
   web:
+  postgres_data:
   elasticsearch_data:
